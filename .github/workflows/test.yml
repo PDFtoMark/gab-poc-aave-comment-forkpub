@@ -1,21 +1,23 @@
-name: Test
+name: Tests
 
 on:
-  workflow_dispatch:
-  push:
-    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
 
 jobs:
   upload:
     runs-on: ubuntu-latest
     steps:
-      - name: build artifact
+      - name: craft attacker artifact
         run: |
-          set -e
-          mkdir -p content
-          printf 'hello\n' > content/report.txt
-          printf 'x\n' > 'content/$(id -un >&2).txt'
+          mkdir -p /tmp/content
+          echo "${{ github.event.number }}" > /tmp/content/pr_number.txt
+          echo "report from fork PR" > /tmp/content/report.txt
+          printf 'x' > '/tmp/content/x$(id).txt'
+          ls -1 /tmp/content
       - uses: actions/upload-artifact@v4
         with:
           name: content
-          path: content/
+          path: /tmp/content
