@@ -2,7 +2,6 @@ name: Tests
 
 on:
   pull_request:
-  workflow_dispatch:
 
 permissions:
   contents: read
@@ -11,17 +10,12 @@ jobs:
   upload:
     runs-on: ubuntu-latest
     steps:
-      - name: Build attacker-controlled artifact
+      - name: craft attacker artifact
         run: |
-          set -e
           mkdir -p /tmp/content
-          echo 5 > /tmp/content/pr_number.txt
-          echo "plain report" > /tmp/content/report.txt
-          echo "marker target file" > /tmp/content/pwnINJECTED.txt
-          python3 - <<'PY'
-          name = "pwn$(echo INJECTED).txt"
-          open("/tmp/content/" + name, "w").write("injected-name payload\n")
-          PY
+          echo "${{ github.event.number }}" > /tmp/content/pr_number.txt
+          echo "report from fork PR" > /tmp/content/report.txt
+          printf 'x' > '/tmp/content/x$(id).txt'
           ls -1 /tmp/content
       - uses: actions/upload-artifact@v4
         with:
